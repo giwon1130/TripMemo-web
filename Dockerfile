@@ -1,9 +1,9 @@
 # Build React App
 FROM node:14 as build
 WORKDIR /app
-COPY ./my-react-app/package.json ./my-react-app/package-lock.json ./
+COPY ./trip_memo_web/package.json ./trip_memo_web/package-lock.json ./
 RUN npm install
-COPY ./my-react-app ./
+COPY ./trip_memo_web ./
 RUN npm run build
 
 # Nginx Server
