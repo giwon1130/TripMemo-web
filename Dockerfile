@@ -1,4 +1,4 @@
-# Build React App
+# Build React App node
 FROM node:14 as build
 WORKDIR /app
 COPY ./package.json ./package-lock.json ./
