@@ -1,0 +1,32 @@
+name: Deploy trip_memo_web to AWS EC2
+
+on:
+  push:
+    branches:
+      - dev  # 또는 사용하는 브랜치 이름
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build and Push Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/trip_memo_web:latest .
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker push ${{ secrets.DOCKER_USERNAME }}/trip_memo_web:latest
+
+    - name: Deploy to AWS EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/trip_memo_web:latest
+          docker stop trip_memo_web || true
+          docker rm trip_memo_web || true
+          docker run -d --name trip_memo_web -p 80:80 ${{ secrets.DOCKER_USERNAME }}/trip_memo_web:latest
